@@ -1,0 +1,92 @@
+==============================================================================
+LOAN DECISION REPORT
+==============================================================================
+[Conditional] sweep-clear-approve                           risk=0.91 conf=0.91
+             Credit-history path: credit_score=800, DTI=0.15, employment_years=12.0. Risk score 0.91 lands in the deliberate no-auto-decide zone between the approve and reject bars -> routed to human review.
+[Conditional] sweep-clear-reject                            risk=0.34 conf=0.66
+             Credit-history path: credit_score=520, DTI=0.55, employment_years=0.5. Confidence 0.66 below the 0.85 floor -> routed to human review rather than auto-decided.
+[Conditional] sweep-borderline                              risk=0.59 conf=0.59
+             Credit-history path: credit_score=670, DTI=0.35, employment_years=3.0. Confidence 0.59 below the 0.85 floor -> routed to human review rather than auto-decided.
+[ Approved  ] sweep-extreme-approve                         risk=0.99 conf=0.99
+             Credit-history path: credit_score=850, DTI=0.03, employment_years=20.0. Risk score 0.99 clears the 0.97 auto-approve bar.
+[ Rejected  ] sweep-extreme-reject                          risk=0.01 conf=0.99
+             Credit-history path: credit_score=300, DTI=0.98, employment_years=0.0. Risk score 0.01 falls below the 0.05 auto-reject bar (95% confidence of reject).
+[Conditional] interaction-low-credit-low-dti-long-tenure    risk=0.70 conf=0.70
+             Credit-history path: credit_score=580, DTI=0.18, employment_years=11.0. Confidence 0.70 below the 0.85 floor -> routed to human review rather than auto-decided.
+[Conditional] interaction-high-credit-high-dti-mid-tenure   risk=0.69 conf=0.69
+             Credit-history path: credit_score=790, DTI=0.52, employment_years=5.0. Confidence 0.69 below the 0.85 floor -> routed to human review rather than auto-decided.
+[Conditional] interaction-good-credit-avg-dti-short-tenure  risk=0.61 conf=0.61
+             Credit-history path: credit_score=710, DTI=0.32, employment_years=1.5. Confidence 0.61 below the 0.85 floor -> routed to human review rather than auto-decided.
+[Conditional] no-history-with-bank-data-1                   risk=0.72 conf=0.72
+             No credit history -- used 6-month bank statement stability as the alternative signal (recovery path from the eval design's failure-mode fix). Confidence 0.72 below the 0.85 floor -> routed to human review rather than auto-decided.
+[Conditional] no-history-with-bank-data-2                   risk=0.60 conf=0.60
+             No credit history -- used 6-month bank statement stability as the alternative signal (recovery path from the eval design's failure-mode fix). Confidence 0.60 below the 0.85 floor -> routed to human review rather than auto-decided.
+[Conditional] no-history-no-bank-data-1                     risk=0.53 conf=0.53
+             No credit history AND no bank statement data available -- scored on DTI/employment only, pulled toward the uncertain midpoint so confidence is capped low by design. Confidence 0.53 below the 0.85 floor -> routed to human review rather than auto-decided.
+[Conditional] no-history-with-bank-data-3                   risk=0.82 conf=0.82
+             No credit history -- used 6-month bank statement stability as the alternative signal (recovery path from the eval design's failure-mode fix). Confidence 0.82 below the 0.85 floor -> routed to human review rather than auto-decided.
+[Conditional] matched-history-1                             risk=0.68 conf=0.68
+             Credit-history path: credit_score=700, DTI=0.22, employment_years=4.0. Confidence 0.68 below the 0.85 floor -> routed to human review rather than auto-decided.
+[Conditional] matched-history-2                             risk=0.61 conf=0.61
+             Credit-history path: credit_score=690, DTI=0.28, employment_years=2.0. Confidence 0.61 below the 0.85 floor -> routed to human review rather than auto-decided.
+[Conditional] matched-history-3                             risk=0.66 conf=0.66
+             Credit-history path: credit_score=705, DTI=0.25, employment_years=3.5. Confidence 0.66 below the 0.85 floor -> routed to human review rather than auto-decided.
+[Conditional] matched-history-4                             risk=0.74 conf=0.74
+             Credit-history path: credit_score=720, DTI=0.19, employment_years=6.0. Confidence 0.74 below the 0.85 floor -> routed to human review rather than auto-decided.
+
+==============================================================================
+SEGMENT BIAS AUDIT -- WITHOUT recovery path (reproduces the failure mode)
+==============================================================================
+{
+  "no_credit_history_segment_NAIVE": {
+    "n": 4,
+    "decision_rates": {
+      "Approved": 0.0,
+      "Conditional": 0.0,
+      "Rejected": 1.0
+    },
+    "avg_confidence": 0.97
+  },
+  "matched_credit_history_segment": {
+    "n": 4,
+    "decision_rates": {
+      "Approved": 0.0,
+      "Conditional": 1.0,
+      "Rejected": 0.0
+    },
+    "avg_confidence": 0.674
+  }
+}
+
+==============================================================================
+SEGMENT BIAS AUDIT -- WITH recovery path (current engine behavior)
+==============================================================================
+{
+  "no_credit_history_segment": {
+    "n": 4,
+    "decision_rates": {
+      "Approved": 0.0,
+      "Conditional": 1.0,
+      "Rejected": 0.0
+    },
+    "avg_confidence": 0.666
+  },
+  "matched_credit_history_segment": {
+    "n": 4,
+    "decision_rates": {
+      "Approved": 0.0,
+      "Conditional": 1.0,
+      "Rejected": 0.0
+    },
+    "avg_confidence": 0.674
+  }
+}
+
+==============================================================================
+SUMMARY
+==============================================================================
+No-credit-history reject rate WITHOUT recovery path: 100%
+No-credit-history reject rate WITH recovery path:    0%
+Matched comparable-history segment reject rate:      0%
+
+This is the detection method from the eval design (Section 4): comparing decision rates between the no-history segment and a matched comparable segment. The naive engine shows a large gap (the failure mode); the recovery-path engine closes it substantially.
