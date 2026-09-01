@@ -1,9 +1,9 @@
 """
 Builds the applicant test dataset used to exercise the decision engine.
 
-Follows the design from guide1-assignment.md:
+Follows this project's own eval design:
   - A handful of single-variable sweep cases (clear approve / clear reject)
-  - The 3 interaction profiles worked out in that assignment
+  - The 3 interaction profiles worked out during design
   - A no-credit-history segment AND a matched comparable-credit-history
     segment (same income/employment), so the audit module can compare
     decision rates between them -- this is what makes the failure-mode

@@ -2,7 +2,7 @@
 Loan Eval Decision Engine
 
 A rule-based loan-application decision engine that implements the eval
-framework designed in guide1-assignment.md: differentiated confidence
+framework this project implements: differentiated confidence
 thresholds by decision type, a no-credit-history fallback path, and
 segment-level bias auditing.
 
@@ -33,7 +33,7 @@ class Decision(str, Enum):
     REJECTED = "Rejected"
 
 
-# Thresholds designed in the assignment (Section 3: Deployment Thresholds).
+# Thresholds from the eval design (differentiated by decision type).
 # Both are expressed directly on risk_score (P(approve)), since confidence
 # is derived from risk_score's distance from 0.5 -- see module docstring.
 AUTO_APPROVE_THRESHOLD = 0.97   # risk_score >= this -> auto-approve

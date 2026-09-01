@@ -1,4 +1,7 @@
-# Loan Eval Decision Engine
+# LendFair
+
+_A loan decision engine with differentiated confidence thresholds and a segment-level bias audit._
+
 
 A rule-based loan-application decision engine with **differentiated confidence
 thresholds**, a **no-credit-history recovery path**, and a **segment-level bias
@@ -66,15 +69,9 @@ That's the failure mode made visible and then closed, not just described.
   but not as proven a signal, and a system that pretended otherwise would be
   overconfident in the wrong direction.
 
-## Background
+## Why this exists
 
-This started as Guide 1, Assignment 1 in a self-directed FDE (Forward
-Deployed Engineer) learning program — "design a complete evaluation framework
-for a bank loan-approval AI." That assignment (metrics, thresholds, and the
-no-credit-history failure mode + recovery path) is what this engine
-implements end to end. The original design write-up focused on *how you'd
-evaluate* such a system before trusting it; this repo is that design made
-runnable, plus the audit that proves the recovery path actually works.
+Most "AI loan approval" demos show a model making decisions. This one is about the harder, less glamorous problem underneath: how do you actually evaluate whether such a system is safe to trust — differentiated confidence thresholds, a documented failure mode, and an audit that proves the fix works? This repo is that eval design made runnable, plus the audit that proves the recovery path actually closes the gap.
 
 ## Status / limitations
 

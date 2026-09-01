@@ -1,7 +1,7 @@
 """
 Segment-level bias audit.
 
-Implements the DETECTION method from guide1-assignment.md Section 4: compare
+Implements the detection method this project's eval design calls for: compare
 the decision-rate breakdown for the "no credit history" segment against a
 matched comparable-credit-history segment. A significantly higher
 reject/conditional rate for the no-history segment is the signal that the
