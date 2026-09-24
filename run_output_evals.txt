@@ -1,0 +1,7 @@
+== LendFair eval ==
+cases=21 runs/case=3 accuracy=100.0% consistency=100.0%
+  explain                      acc=100.0% cons=100.0% n=3
+  fairness                     acc=100.0% cons=100.0% n=1
+  memory                       acc=100.0% cons=100.0% n=1
+  policy                       acc=100.0% cons=100.0% n=16
+GATE: PASS

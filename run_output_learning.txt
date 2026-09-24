@@ -1,0 +1,6 @@
+phase   static auto-approved  static defaults  gen4 auto-approved  gen4 defaults  escalated
+1                        150        28 (18.7%)                 109       6 ( 5.5%)         41
+2                        150        30 (20.0%)                  93       1 ( 1.1%)         57
+3                        150        23 (15.3%)                 105       0 ( 0.0%)         45
+
+guardrail: ok | pending proposals: []
