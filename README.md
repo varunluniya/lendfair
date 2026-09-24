@@ -52,6 +52,17 @@ curl localhost:8000/audit/fairness
 
 **New files:** `service.py` (Gen-4 wiring) · `app.py` (API) · `gen4/` (shared kernel) · `knowledge/` · `run_evals.py` · `simulate_learning.py` · `tests/` · `Dockerfile` · `render.yaml` · `.github/workflows/ci.yml`
 
+## Demo data
+
+`python seed.py` fills `data/lendfair.db` with synthetic history so every endpoint returns something meaningful on first run: 720 applications over 12 months (prime, distressed, thin-file and a hidden blind-spot pocket), repayment outcomes for disbursed loans older than 120 days, memory escalations, and one pending threshold proposal from the default guardrail.
+
+```bash
+python seed.py            # create data/lendfair.db
+python seed.py --reset    # rebuild it from scratch
+```
+
+The Docker image seeds `/data` on first boot (set `GEN4_SEED=0` to start empty). All of it is synthetic: no real customers, patients, tickets or model outputs. `GET /health` shows the dataset's counts.
+
 ---
 
 ## The original engine (v1)
