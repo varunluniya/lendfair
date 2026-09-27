@@ -27,7 +27,7 @@ from decision_engine import (
     AUTO_APPROVE_THRESHOLD, AUTO_REJECT_THRESHOLD, CONFIDENCE_FLOOR,
     Applicant, Decision, _normalize_credit_score, score_applicant,
 )
-from gen4 import Context, KnowledgeBase, LLMClient, Memory, Trace
+from gen4 import Context, KnowledgeBase, LLMClient, Memory, Trace, guardrail_check
 from gen4 import feedback as fb
 
 SYSTEM = "lendfair"
@@ -170,7 +170,28 @@ class LendFairService:
                  f"loan decision. Use only these principal reasons: {reasons}.",
             passages=passages, context=Context(), memory_notes=[],
             output_contract="Plain text. No protected characteristics. Say what would change the outcome.")
-        return self.llm.complete(prompt, offline=offline, max_tokens=200)
+        draft = self.llm.complete(prompt, offline=offline, max_tokens=200)
+        return self._guarded(draft, decision, offline(), passages)
+
+    def _guarded(self, draft: str, decision: Decision, fallback: str, passages) -> str:
+        """Post-model guardrail (Guide 4 Section 7.3): a draft explanation grounded in
+        the cited policy can still misstate the decision it explains -- e.g. use
+        language that reads as an approval for a Conditional/Rejected outcome, or
+        omit that a Conditional result requires human underwriter review. Neither
+        error is visible from the retrieval trace alone, which is exactly the gap
+        that let the Air Canada chatbot reach a customer with a wrong answer."""
+        def offline_check(response: str, _passages) -> tuple[bool, str]:
+            low = response.lower()
+            if decision != Decision.APPROVED and ("you are approved" in low or "you're approved" in low
+                                                   or (low.startswith("approved") and "not approved" not in low)):
+                return False, "draft reads as an approval but the actual decision is " + decision.value.lower()
+            if decision == Decision.CONDITIONAL and "review" not in low and "underwriter" not in low:
+                return False, "Conditional decision must tell the applicant a human will review it"
+            return True, ""
+        is_safe, reason = guardrail_check(draft, passages, self.llm, offline=offline_check)
+        if is_safe:
+            return draft
+        return fallback + f" (Note: guardrail replaced a draft that {reason}.)"
 
     # -- context helpers ---------------------------------------------------------
     def parity(self, window: int = 500) -> dict:
