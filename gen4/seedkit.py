@@ -15,7 +15,7 @@ NOW = datetime(2026, 9, 24, 9, 0, tzinfo=timezone.utc)
 
 
 def iso(days_ago: float, now: datetime = NOW) -> str:
-    return (now - timedelta(days=days_ago)).isoformat()
+    return (now - timedelta(days=days_ago)).isoformat(timespec="microseconds")
 
 
 def args(default_db: str, description: str):
@@ -40,5 +40,5 @@ def already_seeded(memory) -> bool:
 def mark(memory, name: str, seed: int, counts: dict) -> None:
     memory.add_fact("dataset", "seed", {
         "synthetic": True, "generator": "seed.py", "service": name, "seed": seed,
-        "generated_at": NOW.isoformat(), "counts": counts,
+        "generated_at": NOW.isoformat(timespec="microseconds"), "counts": counts,
         "note": "Synthetic demo data. No real customers, patients or tickets."}, source="seed")

@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS fact_history (
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(timezone.utc).isoformat(timespec="microseconds")
 
 
 class Memory:
